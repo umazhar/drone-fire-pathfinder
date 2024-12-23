@@ -1,6 +1,23 @@
-# drone-fire-pathfinder
-2D Drone Pathfinding and Fire Monitoring Algorithm
+# 2D Pathfinding and Fire Monitoring Algorithm for a Drone
 
-# How to compile
+This project simulates a drone navigating a 2D grid-based environment to monitor and locate fires, simulating real-world UAV capabilities. It features dynamic fire spread, perception updates, and basic data communication between the drone and a ground station. 
 
-If using the Code Runner extension on VS Code, we need to change the executor map to support functionality not present in the default (1998 standard). Add the following argument to "cpp" to code-runner.executorMap in the extension settings -std=c++17
+## How to Compile
+
+### Using Code Runner in Visual Studio Code
+1. Install the **Code Runner** extension.
+2. Update the executor map to support modern C++ standards:
+   - Open the extension settings in VS Code.
+   - Add the following argument to `"cpp"` in the `code-runner.executorMap` setting:
+     ```json
+     "cpp": "g++ -std=c++17" ...
+     ```
+3. Save your settings and run the project.
+
+### Alternative Compilation (Command Line)
+If you're not using Code Runner:
+1. Open a terminal in the project root directory.
+2. Run the makefile
+   ```json
+   make run 
+   ```
