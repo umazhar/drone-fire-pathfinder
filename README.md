@@ -18,6 +18,6 @@ This project simulates a drone navigating a 2D grid-based environment to monitor
 If you're not using Code Runner:
 1. Open a terminal in the project root directory.
 2. Run the makefile
-   ```json
-   make run 
+   ```bash
+   make run
    ```
