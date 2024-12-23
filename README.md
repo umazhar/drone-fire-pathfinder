@@ -23,5 +23,5 @@ If you're not using Code Runner:
 1. Open a terminal in the project root directory.
 2. Run the makefile
    ```bash
-   make run`
+   make run
    ```
