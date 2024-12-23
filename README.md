@@ -10,7 +10,7 @@ This project simulates a drone navigating a 2D grid-based environment to monitor
    - Open the extension settings in VS Code.
    - Add the following argument to `"cpp"` in the `code-runner.executorMap` setting:
      ```json
-     "cpp": "g++ -std=c++17" ...
+     "cpp": "g++ -std=c++17"
      ```
 3. Save your settings and run the project.
 
