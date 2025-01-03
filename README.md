@@ -17,7 +17,7 @@ This project simulates a drone navigating a 2D grid-based environment to monitor
     "cpp": "cd $dir && g++ -std=c++17 $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
     ```
 3. Save your settings and run the project.
-
+# HELLO
 ### Alternative Compilation (Command Line)
 If you're not using Code Runner:
 1. Open a terminal in the project root directory.
