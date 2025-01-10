@@ -57,7 +57,7 @@ int main() {
     // Populate the grid with a 25% chance of a fire ('X') in each cell
     for (int i = 0; i < x; i++) {
         for (int j = 0; j < y; j++) {
-            if (rand() % 100 < 25) { // 25% chance
+            if (rand() % 100 < 15) { // 15% chance
                 grid[i][j] = 'X';
                 firePositions.push_back({i, j});
             }
@@ -72,22 +72,42 @@ int main() {
 
     // Drone's movement through the grid
     for (int i = 0; i < x; i++) {
-        for (int j = 0; j < y; j++) {
-            droneRow = i;
-            droneCol = j;
+        if (i % 2 == 0) { // Left-to-right for even rows
+            for (int j = 0; j < y; j++) {
+                droneRow = i;
+                droneCol = j;
 
-            // Clear the screen and display the updated grid
-            clearScreen();
-            displayGrid(grid, droneRow, droneCol, x, y);
+                // Clear the screen and display the updated grid
+                clearScreen();
+                displayGrid(grid, droneRow, droneCol, x, y);
 
-            // Check if the current cell has a fire
-            if (grid[droneRow][droneCol] == 'X') {
-                discoveredFires.push_back({droneRow, droneCol});
-                cout << "Fire discovered at: (" << droneRow << ", " << droneCol << ")" << endl;
+                // Check if the current cell has a fire
+                if (grid[droneRow][droneCol] == 'X') {
+                    discoveredFires.push_back({droneRow, droneCol});
+                    cout << "Fire discovered at: (" << droneRow << ", " << droneCol << ")" << endl;
+                }
+
+                // Wait for a moment to simulate animation
+                this_thread::sleep_for(chrono::milliseconds(300));
             }
+        } else { // Right-to-left for odd rows
+            for (int j = y - 1; j >= 0; j--) {
+                droneRow = i;
+                droneCol = j;
 
-            // Wait for a moment to simulate animation
-            this_thread::sleep_for(chrono::milliseconds(300));
+                // Clear the screen and display the updated grid
+                clearScreen();
+                displayGrid(grid, droneRow, droneCol, x, y);
+
+                // Check if the current cell has a fire
+                if (grid[droneRow][droneCol] == 'X') {
+                    discoveredFires.push_back({droneRow, droneCol});
+                    cout << "Fire discovered at: (" << droneRow << ", " << droneCol << ")" << endl;
+                }
+
+                // Wait for a moment to simulate animation
+                this_thread::sleep_for(chrono::milliseconds(300));
+            }
         }
     }
 
