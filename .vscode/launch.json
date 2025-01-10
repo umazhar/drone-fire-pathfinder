@@ -3,11 +3,13 @@
   "configurations": [
     {
       "name": "C/C++ Runner: Debug Session",
-      "type": "lldb",
+      "type": "cppvsdbg",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/umair/Desktop/Code/drone-fire-pathfinder/src",
-      "program": "/Users/umair/Desktop/Code/drone-fire-pathfinder/src/build/Debug/outDebug"
+      "stopAtEntry": false,
+      "console": "externalTerminal",
+      "cwd": "c:/Users/u-maz/OneDrive/Desktop/drone-fire-pathfinder/src",
+      "program": "c:/Users/u-maz/OneDrive/Desktop/drone-fire-pathfinder/src/build/Debug/outDebug"
     }
   ]
 }
