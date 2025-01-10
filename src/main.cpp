@@ -17,10 +17,14 @@ void clearScreen() {
 }
 
 // Function to display the grid with the drone and fires
-void displayGrid(char grid[5][5], int droneRow, int droneCol) {
-    for (int i = 0; i < 5; i++) {
-        cout << "+---+---+---+---+---+" << endl;
-        for (int j = 0; j < 5; j++) {
+void displayGrid(const vector<vector<char>>& grid, int droneRow, int droneCol, int x, int y) {
+    for (int i = 0; i < x; i++) {
+        cout << "+";
+        for (int j = 0; j < y; j++) {
+            cout << "---+";
+        }
+        cout << endl;
+        for (int j = 0; j < y; j++) {
             if (i == droneRow && j == droneCol) {
                 cout << "| D "; // Drone's current position
             } else if (grid[i][j] == 'X') {
@@ -31,25 +35,31 @@ void displayGrid(char grid[5][5], int droneRow, int droneCol) {
         }
         cout << "|" << endl;
     }
-    cout << "+---+---+---+---+---+" << endl;
+    cout << "+";
+    for (int j = 0; j < y; j++) {
+        cout << "---+";
+    }
+    cout << endl;
 }
 
 // Main program
 int main() {
-    srand(time(0)); // Seed for random number generation
+    srand(static_cast<unsigned int>(time(0))); // Seed for random number generation
 
-    // Initialize the grid
-    char grid[5][5];
+    // Define grid dimensions
+    int x = 15; // Number of rows
+    int y = 15; // Number of columns
+
+    // Initialize the grid using a vector
+    vector<vector<char>> grid(x, vector<char>(y, ' '));
     vector<pair<int, int>> firePositions; // To store fire positions
 
     // Populate the grid with a 25% chance of a fire ('X') in each cell
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5; j++) {
+    for (int i = 0; i < x; i++) {
+        for (int j = 0; j < y; j++) {
             if (rand() % 100 < 25) { // 25% chance
                 grid[i][j] = 'X';
                 firePositions.push_back({i, j});
-            } else {
-                grid[i][j] = ' ';
             }
         }
     }
@@ -61,14 +71,14 @@ int main() {
     vector<pair<int, int>> discoveredFires;
 
     // Drone's movement through the grid
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5; j++) {
+    for (int i = 0; i < x; i++) {
+        for (int j = 0; j < y; j++) {
             droneRow = i;
             droneCol = j;
 
             // Clear the screen and display the updated grid
             clearScreen();
-            displayGrid(grid, droneRow, droneCol);
+            displayGrid(grid, droneRow, droneCol, x, y);
 
             // Check if the current cell has a fire
             if (grid[droneRow][droneCol] == 'X') {
@@ -83,7 +93,7 @@ int main() {
 
     // Display the final list of discovered fires
     clearScreen();
-    displayGrid(grid, -1, -1); // Display the grid without the drone
+    displayGrid(grid, -1, -1, x, y); // Display the grid without the drone
     cout << "\nAll fires discovered:" << endl;
     for (auto fire : discoveredFires) {
         cout << "(" << fire.first << ", " << fire.second << ")" << endl;

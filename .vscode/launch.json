@@ -3,11 +3,13 @@
   "configurations": [
     {
       "name": "C/C++ Runner: Debug Session",
-      "type": "lldb",
+      "type": "cppvsdbg",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/umair/Desktop/Code/drone-fire-pathfinder/src",
-      "program": "/Users/umair/Desktop/Code/drone-fire-pathfinder/src/build/Debug/outDebug"
+      "stopAtEntry": false,
+      "console": "externalTerminal",
+      "cwd": "c:/Ammar/Resumes/Professional Resume/2025 Winter and Summer Applications/01-Riipen Level Up/R&D Drone Project for Alvia Systems Inc/Work/drone-fire-pathfinder/src",
+      "program": "c:/Ammar/Resumes/Professional Resume/2025 Winter and Summer Applications/01-Riipen Level Up/R&D Drone Project for Alvia Systems Inc/Work/drone-fire-pathfinder/src/build/Debug/outDebug"
     }
   ]
 }
