@@ -1,35 +1,19 @@
-CXX      = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Werror
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall -I./include
 
-SRC_DIR = src
-INC_DIR = include
+SRCS = src/GridMap.cpp src/FireSpreadSimulator.cpp src/Drone.cpp \
+       src/PerceptionMap.cpp src/Pathfinder.cpp src/CommModule.cpp src/main.cpp
+OBJS = $(SRCS:.cpp=.o)
 
-TARGET  = drone_sim
+TARGET = drone_fire_sim
 
-# List of source files 
-SOURCES = \
-    $(SRC_DIR)/main.cpp \
-    $(SRC_DIR)/GridMap.cpp \
-
-OBJECTS = $(SOURCES:.cpp=.o)
-
-# Default rule: build the executable
 all: $(TARGET)
 
-$(TARGET): $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -I $(INC_DIR) $^ -o $@
+$(TARGET): $(OBJS)
+    $(CXX) $(CXXFLAGS) -o $@ $(OBJS)
 
-# Rule to compile each .cpp into an .o
-# $< is the first prerequisite (the .cpp)
-# $@ is the target (the .o)
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -I $(INC_DIR) -c $< -o $@
-
-run: $(TARGET)
-	@echo "Running the $(TARGET) executable..."
-	./$(TARGET)
+    $(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJECTS) $(TARGET)
-
-.PHONY: all clean run
+    rm -f $(OBJS) $(TARGET)
