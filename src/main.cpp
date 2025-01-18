@@ -4,8 +4,6 @@
 #include <ctime>
 #include <thread>
 #include <chrono>
-
-// Include our GridMap class
 #include "GridMap.h"
 
 using namespace std;
@@ -13,14 +11,17 @@ using namespace std;
 // Function to clear the screen
 void clearScreen() {
 #ifdef _WIN32
-    system("cls"); // For Windows
+    system("cls");
 #else
-    system("clear"); // For Unix/Linux/Mac
+    system("clear"); 
 #endif
 }
 
-// Function to display the grid with the drone and fires
-void displayGrid(const GridMap& map, int droneRow, int droneCol) {
+// Updated display function to handle "discovered" status.
+void displayGrid(const GridMap& map,
+                 int droneRow, int droneCol,
+                 const vector<vector<bool>>& discovered)
+{
     int x = map.getRows();
     int y = map.getCols();
 
@@ -34,18 +35,22 @@ void displayGrid(const GridMap& map, int droneRow, int droneCol) {
 
         // Print row content
         for (int j = 0; j < y; j++) {
-            if (i == droneRow && j == droneCol) {
+            // If undiscovered, display "?"
+            if (!discovered[i][j]) {
+                cout << "| ? ";
+            }
+            else if (i == droneRow && j == droneCol) {
                 cout << "| D "; // Drone's current position
-            } else if (map.getCell(i, j) == 'X') {
+            }
+            else if (map.getCell(i, j) == 'X') {
                 cout << "| X "; // Fire
-            } else {
+            }
+            else {
                 cout << "|   "; // Empty cell
             }
         }
         cout << "|" << endl;
     }
-
-    // Print bottom boundary of the last row
     cout << "+";
     for (int j = 0; j < y; j++) {
         cout << "---+";
@@ -54,67 +59,65 @@ void displayGrid(const GridMap& map, int droneRow, int droneCol) {
 }
 
 int main() {
-    srand(static_cast<unsigned int>(time(0))); // Seed for random number generation
+    srand(static_cast<unsigned int>(time(0))); // Seed random
 
-    // Define grid dimensions
-    int x = 7; // Number of rows
-    int y = 7; // Number of columns
+    // grid dimensions
+    int x = 7; 
+    int y = 7; 
 
     // Create and populate the grid
     GridMap map(x, y);
-    map.populateRandomFires(15); // 15% chance of a fire in any cell
-
-    // Initialize the drone's position
+    map.populateRandomFires(15);
     int droneRow = 0, droneCol = 0;
+
+    // Prepare a 2D "discovered" array, initialized to false
+    vector<vector<bool>> discovered(x, vector<bool>(y, false));
+    auto discoverNearbyCells = [&](int row, int col) {
+        for (int i = row - 1; i <= row + 1; i++) {
+            for (int j = col - 1; j <= col + 1; j++) {
+                if (i >= 0 && i < x && j >= 0 && j < y) {
+                    discovered[i][j] = true;
+                }
+            }
+        }
+    };
 
     // Vector to store discovered fires
     vector<pair<int, int>> discoveredFires;
 
     // Drone's movement through the grid (simple row-by-row scan)
     for (int i = 0; i < x; i++) {
-        if (i % 2 == 0) { // Left-to-right for even rows
+        if (i % 2 == 0) { 
             for (int j = 0; j < y; j++) {
                 droneRow = i;
                 droneCol = j;
-
-                // Clear the screen and display the updated grid
+                discoverNearbyCells(droneRow, droneCol);
                 clearScreen();
-                displayGrid(map, droneRow, droneCol);
-
-                // Check if the current cell has a fire
+                displayGrid(map, droneRow, droneCol, discovered);
                 if (map.getCell(droneRow, droneCol) == 'X') {
                     discoveredFires.push_back({droneRow, droneCol});
                     cout << "Fire discovered at: (" << droneRow << ", " << droneCol << ")" << endl;
                 }
-
-                // Wait for a moment to simulate animation
                 this_thread::sleep_for(chrono::milliseconds(300));
             }
-        } else { // Right-to-left for odd rows
+        } else { // odd rows
             for (int j = y - 1; j >= 0; j--) {
                 droneRow = i;
                 droneCol = j;
-
-                // Clear the screen and display the updated grid
+                discoverNearbyCells(droneRow, droneCol);
                 clearScreen();
-                displayGrid(map, droneRow, droneCol);
-
-                // Check if the current cell has a fire
+                displayGrid(map, droneRow, droneCol, discovered);
                 if (map.getCell(droneRow, droneCol) == 'X') {
                     discoveredFires.push_back({droneRow, droneCol});
                     cout << "Fire discovered at: (" << droneRow << ", " << droneCol << ")" << endl;
                 }
-
-                // Wait for a moment to simulate animation
                 this_thread::sleep_for(chrono::milliseconds(300));
             }
         }
     }
 
-    // Display the final list of discovered fires
     clearScreen();
-    // Display the grid without the drone
-    displayGrid(map, -1, -1);
+    displayGrid(map, -1, -1, discovered);
 
     cout << "\nAll fires discovered:" << endl;
     for (auto fire : discoveredFires) {
