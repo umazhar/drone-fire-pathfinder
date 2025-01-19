@@ -1,19 +1,25 @@
+# Define the source directory
+SRC_DIR = src
+
+# Define the output executables
+BASE_STATION_SERVER = BaseStationServer
+DRONE_CLIENT = DroneClient
+
+# Define the compiler and flags
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -I./include
+CXXFLAGS = -lws2_32
 
-SRCS = src/GridMap.cpp src/FireSpreadSimulator.cpp src/Drone.cpp \
-       src/PerceptionMap.cpp src/Pathfinder.cpp src/CommModule.cpp src/main.cpp
-OBJS = $(SRCS:.cpp=.o)
+# Build all targets
+all: $(BASE_STATION_SERVER) $(DRONE_CLIENT)
 
-TARGET = drone_fire_sim
+# Compile BaseStationServer
+$(BASE_STATION_SERVER): $(SRC_DIR)/BaseStationServer.cpp
+	$(CXX) $< -o $@ $(CXXFLAGS)
 
-all: $(TARGET)
+# Compile DroneClient
+$(DRONE_CLIENT): $(SRC_DIR)/DroneClient.cpp $(SRC_DIR)/GridMap.cpp
+	$(CXX) $^ -o $@ $(CXXFLAGS)
 
-$(TARGET): $(OBJS)
-    $(CXX) $(CXXFLAGS) -o $@ $(OBJS)
-
-%.o: %.cpp
-    $(CXX) $(CXXFLAGS) -c $< -o $@
-
+# Clean build artifacts
 clean:
-    rm -f $(OBJS) $(TARGET)
+	rm -f $(BASE_STATION_SERVER) $(DRONE_CLIENT)
