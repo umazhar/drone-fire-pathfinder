@@ -2,7 +2,11 @@
 
 This project simulates a drone navigating a 2D grid-based environment to monitor and locate fires, simulating real-world UAV capabilities. It features dynamic fire spread, perception updates, and basic data communication between the drone and a ground station. The system is split into two programs:
 - **Base Station (Server):** Receives fire alerts from the drone and updates a live map as fires are discovered.
+  ![image](https://github.com/user-attachments/assets/2d48e7b5-ae02-4198-ab84-0335c10fb882)
+
 - **Drone (Client):** Simulates scanning a grid, discovering fires, and reporting them to the Base Station.
+  ![image](https://github.com/user-attachments/assets/c2762bbf-0e26-4188-867d-a93f97ad43af)
+
 
 ## How to Compile
 
