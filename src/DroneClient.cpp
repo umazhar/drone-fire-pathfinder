@@ -218,38 +218,63 @@ int main() {
         WSACleanup();
         return 1;
     }
-    std::cout << "[Drone] Connected to server!\n";
+    std::cout << "[Drone] Connected to server!\n\n";
 
-    // create the drone’s local map (15x15) with random fires
-    int rows = 15, cols = 15;
+    // Prompt #1: grid size in one line
+    int rows, cols;
+    std::cout << "Enter the grid size (rows columns): ";
+    std::cin >> rows >> cols;
+
+    // Create the drone’s local map
     GridMap map(rows, cols);
-    map.populateRandomFires(10); // 10% random fires
+    // Populate with random fires (10% chance)
+    map.populateRandomFires(10);
 
-    // BFS data
-    std::vector<std::vector<bool>> discovered(rows, std::vector<bool>(cols, false));
+    // Prompt #2: drone start coordinate in one line
+    int droneRow, droneCol;
+    std::cout << "Enter the drone's starting coordinate (row column): ";
+    std::cin >> droneRow >> droneCol;
 
-    if (map.getCell(0,0) == 'X') {
-        std::cout << "Cannot start at (0,0) - it's on fire.\n";
+    // Check if coordinates are valid
+    if (droneRow < 0 || droneRow >= rows || droneCol < 0 || droneCol >= cols) {
+        std::cerr << "[Drone] Error: starting position is out of bounds.\n";
         sendLine(sock, "END");
         closesocket(sock);
         WSACleanup();
-        return 0;
+        return 1;
     }
-    int droneRow = 0, droneCol = 0;
+
+    // Check if that cell is on fire
+    if (map.getCell(droneRow, droneCol) == 'X') {
+        std::cerr << "[Drone] Cannot start at (" << droneRow << "," << droneCol 
+                  << ") - it's on fire.\n";
+        sendLine(sock, "END");
+        closesocket(sock);
+        WSACleanup();
+        return 1;
+    }
+
+    // BFS "discovered" data
+    std::vector<std::vector<bool>> discovered(rows, std::vector<bool>(cols, false));
+
+    // Mark neighbors, send FIRE messages for newly seen fires, etc.
     discoverCells(map, discovered, droneRow, droneCol, sock);
 
     int stepCount = 0;
-    double spreadChance = 0.02;
+    double spreadChance = 0.02; // fire spread chance
     bool signalLost = false;
     time_t start = time(0);
 
+    // Scan the entire map row by row
     for (int i = 0; i < rows && !signalLost; i++) {
         if (i % 2 == 0) {
+            // left->right
             for (int j = 0; j < cols && !signalLost; j++) {
                 if (discovered[i][j]) continue;
 
                 auto path = getPathBFS(map, droneRow, droneCol, i, j);
                 if (path.empty()) {
+                    // If no path, check if there is any undiscovered cell we can still reach
                     if (!anyReachableUndiscovered(map, discovered, droneRow, droneCol)) {
                         std::cout << "Signal lost!\n";
                         signalLost = true;
@@ -258,6 +283,8 @@ int main() {
                 }
                 for (size_t idx = 1; idx < path.size() && !signalLost; idx++) {
                     auto [r, c] = path[idx];
+
+                    // If the next cell is on fire, try a path recalculation
                     if (map.getCell(r,c) == 'X') {
                         auto newPath = getPathBFS(map, droneRow, droneCol, i, j);
                         if (newPath.empty()) {
@@ -272,6 +299,8 @@ int main() {
                             continue;
                         }
                     }
+
+                    // Move drone
                     droneRow = r; 
                     droneCol = c;
                     discoverCells(map, discovered, droneRow, droneCol, sock);
@@ -289,7 +318,7 @@ int main() {
             }
         } else {
             // right->left
-            for (int j = cols-1; j>=0 && !signalLost; j--) {
+            for (int j = cols - 1; j >= 0 && !signalLost; j--) {
                 if (discovered[i][j]) continue;
 
                 auto path = getPathBFS(map, droneRow, droneCol, i, j);
@@ -302,6 +331,8 @@ int main() {
                 }
                 for (size_t idx = 1; idx < path.size() && !signalLost; idx++) {
                     auto [r, c] = path[idx];
+
+                    // If the next cell is on fire, try a path recalculation
                     if (map.getCell(r,c) == 'X') {
                         auto newPath = getPathBFS(map, droneRow, droneCol, i, j);
                         if (newPath.empty()) {
@@ -316,6 +347,8 @@ int main() {
                             continue;
                         }
                     }
+
+                    // Move drone
                     droneRow = r; 
                     droneCol = c;
                     discoverCells(map, discovered, droneRow, droneCol, sock);
@@ -334,11 +367,13 @@ int main() {
         }
     }
 
+    // Display final map if the drone didn't lose signal
     if (!signalLost) {
         clearScreen();
         std::cout << "=== Final Drone Map ===\n";
         displayDroneMap(map, discovered, -1, -1);
     }
+
     double seconds = difftime(time(0), start);
     std::cout << "Seconds since start: " << seconds << "s\n";
     if (signalLost) {
@@ -347,7 +382,7 @@ int main() {
         std::cout << "\nDone scanning!\n";
     }
 
-    // send end command to server
+    // tell the server we’re done
     sendLine(sock, "END");
 
     closesocket(sock);
